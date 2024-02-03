@@ -13,6 +13,14 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController _characterController;
     private Vector3 _moveVector;
+    [SerializeField] float groundCheckDistance = 5f;
+    private bool isOnGround
+    {
+        get
+        {
+            return Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundCheckDistance);
+        }
+    }
     void Start()
     {
         //получаем компонент CharacterController
@@ -22,6 +30,11 @@ public class PlayerController : MonoBehaviour
     //для обработки нажатия клавиш
     private void Update()
     {
+        
+        if (isOnGround)
+            Debug.Log("We are grounded");
+
+        
 
         //передвижение
         _moveVector =Vector3.zero;
@@ -47,7 +60,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //Прыжок
-        if (Input.GetKeyDown(KeyCode.Space) && _characterController.isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isOnGround)
         {
             _fallVelocity = -JumpForce;
         }
@@ -61,5 +74,11 @@ public class PlayerController : MonoBehaviour
         _fallVelocity += gravity * Time.fixedDeltaTime;
         _characterController.Move(Vector3.down * _fallVelocity * Time.fixedDeltaTime);
         _characterController.Move(_moveVector * Speed * Time.fixedDeltaTime);
+
+        if (isOnGround)
+        {
+            _fallVelocity = 0;
+        }
+
     }
 }
