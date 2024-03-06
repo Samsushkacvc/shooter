@@ -9,12 +9,13 @@ public class FireballSource : MonoBehaviour
     public float targetInSkyDistance;
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
     {
-        var ray = cameralink.ViewportPointToRay(new Vector3 (0.5f, 0.7f, 0));
+        var ray = cameralink.ViewportPointToRay(new Vector3 (0.5f, 0.5f, 0));
 
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit) )

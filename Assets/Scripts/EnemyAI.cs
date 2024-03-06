@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+
 
 public class EnemyAI : MonoBehaviour
 {
     public List<Transform> patrolPoints;
     public PlayerController player;
     public float viewAngle;
+    public Animator animator;
+
+    public float damage = 30;
 
     private NavMeshAgent _navMeshAgent;
     private bool _isPlayerNoticed;
+    private PlayerHealth _playerHealth;
     void Start()
     {
         InitComponentLinks();
@@ -21,11 +27,13 @@ public class EnemyAI : MonoBehaviour
     private void InitComponentLinks()
     {
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _playerHealth = player.GetComponent<PlayerHealth>();
     }
     private void Update()
     {
         NoticePlayerUpdate();
         ChaseUpdate();
+        AttackUpdate();
         PatrolUpdate();
     }
     private void NoticePlayerUpdate() 
@@ -48,12 +56,15 @@ public class EnemyAI : MonoBehaviour
     {
         if (!_isPlayerNoticed)
         {
-            if (_navMeshAgent.remainingDistance == 0)
+            if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
             {
                 PickNewPatrolPoint();
             }
         }
     }
+
+   
+
     private void PickNewPatrolPoint() 
     {
         _navMeshAgent.destination = patrolPoints[UnityEngine.Random.Range(0, patrolPoints.Count)].position;
@@ -63,6 +74,17 @@ public class EnemyAI : MonoBehaviour
         if (_isPlayerNoticed)
         {
             _navMeshAgent.destination = player.transform.position;
+        }
+    }
+
+    private void AttackUpdate()
+    {
+        if (_isPlayerNoticed)
+        {
+            if (_navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
+            {
+                _playerHealth.DealDamage(damage * Time.deltaTime);
+            }
         }
     }
 }
